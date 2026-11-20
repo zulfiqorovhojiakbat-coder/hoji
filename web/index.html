@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="uz">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI Agent Office</title>
+  <meta name="description" content="12 ta AI agent birgalikda sayt va veb-ilovalar yasaydigan ofis.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="static/style.css">
+  <link rel="icon" href="static/icon.svg" type="image/svg+xml">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="./">
+      <img src="static/icon.svg" alt="" width="28" height="28">
+      <span>AI Agent Office</span>
+    </a>
+    <div class="topbar-actions">
+      <label class="visually-hidden" for="project-select">Loyiha</label>
+      <select id="project-select" class="select" hidden></select>
+      <button id="new-project" class="btn" type="button" hidden>Yangi loyiha</button>
+      <button id="open-settings" class="btn btn-quiet" type="button">
+        <span id="key-dot" class="dot"></span><span>AI sozlamalari</span>
+      </button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <div class="col-main">
+      <section id="composer" class="card composer">
+        <h1 id="composer-title">Nima yasaymiz?</h1>
+        <p id="composer-sub" class="muted">Vazifani yozing — 12 agent uni bo'lib oladi, kod yozadi, tekshiradi va tayyor saytni shu yerda ishga tushiradi.</p>
+        <form id="brief-form">
+          <label class="visually-hidden" for="brief">Vazifa</label>
+          <textarea id="brief" rows="3" maxlength="4000" placeholder="Masalan: Toshkentdagi kofexona uchun zamonaviy sayt — menyu, narxlar, stol band qilish formasi va manzil"></textarea>
+          <div class="composer-row">
+            <div id="examples" class="chips"></div>
+            <button id="brief-submit" class="btn btn-primary" type="submit">Agentlarni ishga tushirish</button>
+          </div>
+        </form>
+      </section>
+
+      <section id="project-bar" class="card project-bar" hidden>
+        <div class="project-head">
+          <div>
+            <h1 id="project-name">Loyiha</h1>
+            <p id="project-brief" class="muted"></p>
+          </div>
+          <div class="project-actions">
+            <span id="run-status" class="pill"></span>
+            <button id="stop-run" class="btn btn-danger" type="button" hidden>To'xtatish</button>
+            <button id="rebuild" class="btn" type="button" hidden>Qayta qurish</button>
+            <button id="delete-project" class="btn btn-quiet" type="button">O'chirish</button>
+          </div>
+        </div>
+        <p id="run-message" class="run-message" hidden></p>
+        <form id="change-form" hidden>
+          <label class="visually-hidden" for="change">O'zgartirish so'rovi</label>
+          <input id="change" type="text" maxlength="2000" placeholder="O'zgartirish so'rang: masalan, «sarlavha rangini yashil qil va narxlar jadvalini qo'sh»">
+          <button class="btn btn-primary" type="submit">Yuborish</button>
+        </form>
+      </section>
+
+      <section class="office" aria-label="Ofis">
+        <div class="section-head">
+          <h2>Ofis</h2>
+          <span id="office-summary" class="muted"></span>
+        </div>
+        <div id="desks" class="desks"></div>
+      </section>
+
+      <section id="preview-card" class="card preview" hidden>
+        <div class="section-head">
+          <h2>Jonli ko'rinish <span id="preview-version" class="muted"></span></h2>
+          <div class="preview-tools">
+            <div class="segmented" role="group" aria-label="Ekran o'lchami">
+              <button type="button" data-device="desktop" class="active">Kompyuter</button>
+              <button type="button" data-device="mobile">Telefon</button>
+            </div>
+            <button id="preview-reload" class="btn" type="button">Yangilash</button>
+            <a id="preview-open" class="btn" target="_blank" rel="noopener">Yangi oynada ochish</a>
+            <a id="preview-zip" class="btn">ZIP yuklab olish</a>
+          </div>
+        </div>
+        <div id="preview-frame-wrap" class="frame-wrap">
+          <iframe id="preview-frame" title="Yaratilgan sayt" sandbox="allow-scripts allow-forms allow-same-origin allow-modals allow-popups"></iframe>
+        </div>
+      </section>
+    </div>
+
+    <aside class="col-side card">
+      <div class="tabs" role="tablist">
+        <button role="tab" data-tab="chat" class="active" type="button">Jamoa chati</button>
+        <button role="tab" data-tab="files" type="button">Fayllar <span id="files-count" class="count"></span></button>
+        <button role="tab" data-tab="checks" type="button">Tekshiruv <span id="checks-count" class="count"></span></button>
+      </div>
+      <div id="tab-chat" class="tab-panel active">
+        <div id="chat" class="chat"><p class="empty">Agentlar ishni boshlaganda ularning yozishmalari shu yerda ko'rinadi.</p></div>
+      </div>
+      <div id="tab-files" class="tab-panel">
+        <ul id="files" class="files"></ul>
+        <p id="files-empty" class="empty">Hali fayllar yo'q.</p>
+      </div>
+      <div id="tab-checks" class="tab-panel">
+        <div id="checks" class="checks"></div>
+        <p id="checks-empty" class="empty">Xato qidiruvchi va Xavfsizlik auditori topilmalari shu yerda chiqadi.</p>
+      </div>
+    </aside>
+  </main>
+
+  <footer class="footer">
+    <span>12 agent · Gemini yoki OpenAI-mos model bilan ishlaydi</span>
+    <a href="https://app.devin.ai/sessions/bb66f0d4d2ea4f42ae1b5dd17b48766f" target="_blank" rel="noopener">O'zgartirish so'rash</a>
+  </footer>
+
+  <dialog id="settings" class="dialog">
+    <form id="settings-form" method="dialog">
+      <h2>AI sozlamalari</h2>
+      <p class="muted">Kalit faqat serverda saqlanadi va brauzerga qaytarilmaydi.</p>
+      <label>Provayder
+        <select id="set-provider" class="select">
+          <option value="gemini">Google Gemini</option>
+          <option value="openai">OpenAI-mos (OpenAI, OpenRouter, Groq…)</option>
+        </select>
+      </label>
+      <label>API kaliti <span id="set-key-hint" class="muted"></span>
+        <input id="set-key" type="password" autocomplete="off" placeholder="Yangi kalit (bo'sh qoldirsangiz o'zgarmaydi)">
+      </label>
+      <label>Modellar <span class="muted">(ixtiyoriy, vergul bilan; bo'sh bo'lsa avtomatik tanlanadi)</span>
+        <input id="set-models" type="text" placeholder="gemini-flash-latest">
+      </label>
+      <label id="set-base-wrap">Base URL <span class="muted">(OpenAI-mos uchun)</span>
+        <input id="set-base" type="text" placeholder="https://api.openai.com/v1">
+      </label>
+      <p id="set-message" class="run-message" hidden></p>
+      <div class="dialog-actions">
+        <button id="set-cancel" class="btn" type="button">Yopish</button>
+        <button class="btn btn-primary" type="submit">Saqlash</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="file-viewer" class="dialog dialog-wide">
+    <div class="section-head">
+      <h2 id="file-title"></h2>
+      <button id="file-close" class="btn" type="button">Yopish</button>
+    </div>
+    <pre id="file-content"></pre>
+  </dialog>
+
+  <script src="static/app.js" defer></script>
+</body>
+</html>
